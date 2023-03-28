@@ -16,7 +16,7 @@ class InformasiController extends Controller
     public function index()
     {
         $pageConfigs = ['showMenu' => true,'mainLayoutType'=>'vertical'];
-        $breadcrumbs = [ ['link' => "javascript:void(0)", 'name' => auth()->user()->role], ['name' => "Aparat Desa"]];
+        $breadcrumbs = [ ['link' => "javascript:void(0)", 'name' => auth()->user()->role], ['name' => "Halaman Informasi"]];
         $kar = User::orderBy('name')->get();
         $data=Informasi::get();
         $val = array('primary','secondary','warning','danger','info');

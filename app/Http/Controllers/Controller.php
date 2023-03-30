@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Informasi;
+use App\Models\jenis;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -31,7 +32,8 @@ class Controller extends BaseController
     return view('auth.login');
   }
   public function register(){
-    return view('auth.register');
+    $jenis = jenis::orderBy('nama')->get();
+    return view('auth.register',['jeniss'=>$jenis]);
   }
   public function dashboard(){
     return view('dashboard');

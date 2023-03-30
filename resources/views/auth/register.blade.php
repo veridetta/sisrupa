@@ -102,7 +102,10 @@
                   <select type="text" class="form-control @error('jenis') is-invalid @enderror" id="register-jenis"
                     name="jenis" placeholder="" aria-describedby="register-jenis" tabindex="2"
                     value="{{ old('jenis') }}" >
-                    <option value=""></option>
+                    @foreach ($jeniss as $jenis)
+                      
+                    @endforeach
+                    <option value="{{$jenis->id}}">{{$jenis->nama}}</option>
                   </select>
                   @error('jenis')
                     <span class="invalid-feedback" role="alert">

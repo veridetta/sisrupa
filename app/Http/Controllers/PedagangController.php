@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\jenis;
+use App\Models\lokasi;
 use App\Models\pedagang;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -21,12 +22,14 @@ class PedagangController extends Controller
     $kar = User::orderBy('id')->get();
     $jenis = jenis::orderBy('nama')->get();
     $val = array('primary','secondary','warning','danger','info');
-    return view('layouts/pedagang/pedagang', ['jeniss'=>$jenis,'val'=>$val,'kars'=>$kar,'pageConfigs' => $pageConfigs, 'breadcrumbs' => $breadcrumbs]);
+    $lokasi_pasar = lokasi::orderBy('id')->get();
+    return view('layouts/pedagang/pedagang', ['jeniss'=>$jenis,'val'=>$val,'kars'=>$kar,'pageConfigs' => $pageConfigs, 'breadcrumbs' => $breadcrumbs,'lokasi_pasars'=>$lokasi_pasar]);
   }
   public function pedagang_add(Request $request){
     $validator = Validator::make($request->all(), [
       'username' => 'required',
       'password' => 'required',
+      'email' => 'required',
       'nama' => 'required',
       'ttl' => 'required',
       'telp' => 'required',
@@ -45,6 +48,7 @@ class PedagangController extends Controller
         'id' => $request->id_users
     ], [
         'username' => $request->username,
+        'email' => $request->email,
         'name' => $request->nama,
         'password' => Hash::make($request->password),
         'role'=>'pedagang'

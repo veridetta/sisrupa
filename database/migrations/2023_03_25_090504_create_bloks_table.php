@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('bloks', function (Blueprint $table) {
             $table->id();
-            $table->string('id_lokasi');
+            $table->string('id_pasar');
             $table->string('nomor_kios');
             $table->string('blok');
             $table->string('status');

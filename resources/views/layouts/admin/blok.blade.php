@@ -1,7 +1,7 @@
 
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Blok / Kios')
+@section('title', 'Kios '.$pasar)
 
 @section('vendor-style')
   <!-- vendor css files -->
@@ -23,8 +23,10 @@
       <div class="col-lg-12 col-sm-12 col-12">
         @if(auth()->user()->role=='admin')
         <button id="btn-add" class="dt-button add-new btn btn-primary mb-2"  
-        aria-controls="DataTables_Table_0" type="button" data-bs-toggle="modal" data-bs-target="#backdrop"><span>Tambah Blok / Kios</span></button>
+        aria-controls="DataTables_Table_0" type="button" data-bs-toggle="modal" data-bs-target="#backdrop"><span>Tambah Kios</span></button>
         @endif
+        <button id="btn-sewa" class=" d-none dt-button add-new btn btn-primary mb-2"  
+        aria-controls="DataTables_Table_0" type="button" data-bs-toggle="modal" data-bs-target="#modalSewa"><span>Tambah Sewa</span></button>
         <div class="card">
 
           <div class="card-header bg-primary flex-column align-items-start">
@@ -37,7 +39,7 @@
                       </div>
                 </div>
                 <div class="col-lg-11 col-10 my-auto">
-                    <p class="h4 card-text text-white">Daftar Blok / Kios</p>
+                    <p class="h4 card-text text-white">Data Kios  {{$pasar}}</p>
                 </div>
             </div>
           </div>
@@ -47,10 +49,12 @@
                 <thead class="table-light">
                   <tr>
                     <th>No</th>
-                    <th>Lokasi</th>
                     <th>Nomor Kios</th>
                     <th>Blok</th>
+                    <th>Nominal</th>
+                    <th>Jatuh Tempo</th>
                     <th>Status</th>
+                    <th>Nama Pedagang</th>
                     @if(auth()->user()->role=='admin')
                     <th>Status</th>
                     @endif
@@ -69,37 +73,18 @@
       tabindex="-1"
       aria-labelledby="myModalLabel4"
       data-bs-backdrop="false"
-      aria-hidden="true"
-    >
+      aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-header">
-              <h4 class="modal-title" id="myModalLabel4">Tambah Blok / Kios</h4>
+              <h4 class="modal-title" id="myModalLabel4">Tambah Kios</h4>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <form class="add-new-user pt-0" method="POST" action="{{route('blok-add-admin')}}">
+              <form class="add-new-user pt-0" id="myForm" method="POST" action="{{route('blok-add-admin')}}">
                 @csrf
                 <input type="hidden" name="id" value="" id="id_kode"/>
-                <div class="mb-1">
-                  <label class="form-label" for="basic-icon-default-lokasi">Lokasi</label>
-                  <select
-                    type="text"
-                    id="basic-icon-default-lokasi"
-                    class="form-control dt-lokasi"
-                    name="lokasi"
-                    placeholder="H04"
-                    value="{{old('lokasi')}}">
-                    @foreach ($lokasis as $lokasi)
-                      <option value="{{$lokasi->id}}">{{$lokasi->nama}}</option>
-                    @endforeach
-                  </select>
-                  @error('lokasi')
-                      <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                      </span>
-                    @enderror
-                </div>
+                <input type="hidden" name="id_pasar" value="{{$kat}}" id="id_pasar"/>
                 <div class="mb-1">
                   <label class="form-label" for="basic-icon-default-nomor">Nomor Kios</label>
                   <input
@@ -136,6 +121,127 @@
                 <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
               </form>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL SEWA-->
+      <!-- Modal to add new user starts-->
+      <div
+      class="modal modal-primary fade text-start"
+      id="modalSewa"
+      tabindex="-1"
+      aria-labelledby="modalSewa2"
+      data-bs-backdrop="false"
+      aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title" id="modalSewa2">Tambah Sewa Baru</h4>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form class="add-new-user pt-0" id="myForm" method="POST" action="{{route('penyewaan-add-admin')}}">
+                @csrf
+                <input type="hidden" name="id" value="" id="id_kode"/>
+                <input type="hidden" name="id_pasar" value="{{$kat}}" id="id_pasar"/>
+                <div class="mb-1">
+                  <label class="form-label" for="basic-icon-default-id_pedagang">Nama Pedagang</label>
+                  <select
+                    type="text"
+                    id="basic-icon-default-id_pedagang"
+                    class="form-control dt-id_pedagang"
+                    name="id_pedagang"
+                    placeholder="Agus S"
+                    value="{{old('id_pedagang')}}">
+                    @foreach ($pedagangs as $pedagang)
+                      <option value="{{$pedagang->id}}">{{$pedagang->name}}</option>
+                    @endforeach
+                  </select>
+                  @error('id_pedagang')
+                      <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                      </span>
+                    @enderror
+                </div>
+                <div class="mb-1">
+                  <label class="form-label" for="basic-icon-default-id_blok">Nama Blok / Kios</label>
+                  <select
+                    type="text"
+                    id="basic-icon-default-id_blok"
+                    class="form-control dt-id_blok"
+                    name="id_blok"
+                    placeholder="Agus S"
+                    value="{{old('id_blok')}}">
+                    @foreach ($bloks as $blok)
+                      <option value="{{$blok->id}}" @if ($blok->kst>0)
+                        disabled
+                      @endif>{{$blok->nama .' - '.$blok->blok.' - '.$blok->nomor_kios}} @if ($blok->kst>0)
+                       (Sudah disewa)
+                    @endif</option>
+                    @endforeach
+                  </select>
+                  @error('id_blok')
+                      <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                      </span>
+                    @enderror
+                </div>
+                <div class="mb-1">
+                  <label class="form-label" for="basic-icon-default-id_tagihan">Jenis Tagihan</label>
+                  <select
+                    type="text"
+                    id="basic-icon-default-id_tagihan"
+                    class="form-control dt-id_tagihan"
+                    name="id_tagihan"
+                    placeholder="Agus S"
+                    value="{{old('id_tagihan')}}">
+                    @foreach ($tagihans as $tagihan)
+                      <option value="{{$tagihan->id}}">{{$tagihan->nama .' - '.$tagihan->nominal}}</option>
+                    @endforeach
+                  </select>
+                  @error('id_tagihan')
+                      <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                      </span>
+                    @enderror
+                </div>
+                <div class="mb-1">
+                  <label class="form-label" for="basic-icon-default-tanggal">Tanggal</label>
+                  <input
+                    type="date"
+                    id="basic-icon-default-tanggal"
+                    class="form-control dt-tanggal"
+                    name="tanggal"
+                    placeholder="xxxx"
+                    value="{{old('tanggal')}}"
+                  />
+                  @error('tanggal')
+                      <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                      </span>
+                    @enderror
+                </div>
+                <div class="mb-1">
+                  <label class="form-label" for="basic-icon-default-ket">Keterangan</label>
+                  <textarea
+                    type="password"
+                    id="basic-icon-default-ket"
+                    class="form-control dt-ket"
+                    name="ket"
+                    placeholder="xxxx"
+                    value="{{old('ket')}}"></textarea>
+                  @error('ket')
+                      <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                      </span>
+                    @enderror
+                </div>
+                <button type="submit" class="btn btn-primary me-1 data-submit">Kirim</button>
+                <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
 </section>
@@ -161,20 +267,27 @@
   /**
 * DataTables Basic
 */
-
+$('.add-new').click(function(){
+  var kat = '{{$kat}}';
+  document.getElementById("myForm").reset();
+  $("#id_pasar").val(kat);
+  $("#id_kode").val('');
+});
 $(function () {
     'use strict';
     var dt_anggota = $('.dt-anggota');
     // DATA ANGGOTA
     if (dt_anggota.length) {
       var dt_ang = dt_anggota.DataTable({
-        ajax: "{{route('blok-data-admin')}}",
+        ajax: "{{route('blok-data-admin',['id'=>$kat])}}",
         columns: [
           { data: '' },
-          { data: 'nama' },
           { data: 'nomor_kios' },
           { data: 'blok' },
+          { data: 'nominal' },
+          { data: 'jatuh_tempo' },
           { data: 'kontrakans.status' },
+          { data: 'nama_pedagang' },
           @if(auth()->user()->role=='admin'){ data: '' }@endif
         ],
         columnDefs: [
@@ -190,17 +303,62 @@ $(function () {
             render: function (data, type, full, meta) {
               return meta.row + meta.settings._iDisplayStart + 1;
             }
+          },{
+            //number
+            targets: 4,
+            title: 'Jatuh Tempo',
+            orderable: false,
+            render: function (data, type, full, meta) {
+              // Tanggal awal
+              var tanggalAwal = new Date(full.jatuh_tempo);
+              
+              // Mendapatkan pilihan dari pengguna (1 bulan, 3 bulan, atau 1 tahun)
+              var pilihan = full.tagihan_kode; // Ganti dengan input dari pengguna
+
+              // Mendapatkan tanggal berikutnya berdasarkan pilihan
+              var tanggalBerikutnya;
+
+              if (pilihan === "tgh_bl1") {
+                tanggalBerikutnya = new Date(tanggalAwal);
+                tanggalBerikutnya.setMonth(tanggalAwal.getMonth() + 1);
+              } else if (pilihan === "tgh_bl3") {
+                tanggalBerikutnya = new Date(tanggalAwal);
+                tanggalBerikutnya.setMonth(tanggalAwal.getMonth() + 3);
+              } else if (pilihan === "tgh_th") {
+                tanggalBerikutnya = new Date(tanggalAwal);
+                tanggalBerikutnya.setFullYear(tanggalAwal.getFullYear() + 1);
+              } else {
+                console.error("Pilihan tidak valid");
+              }
+
+              if (tanggalBerikutnya) {
+                // Mendapatkan komponen tanggal berikutnya
+                var tahunBerikutnya = tanggalBerikutnya.getFullYear();
+                var bulanBerikutnya = ("0" + (tanggalBerikutnya.getMonth() + 1)).slice(-2);
+                var tanggalBerikutnya = ("0" + tanggalBerikutnya.getDate()).slice(-2);
+
+                // Format tanggal dalam format YYYY-MM-DD
+                var tanggalBerikutnyaFormatted = tahunBerikutnya + "-" + bulanBerikutnya + "-" + tanggalBerikutnya;
+
+                console.log("Tanggal berikutnya: " + tanggalBerikutnyaFormatted);
+              } else {
+                console.error("Gagal menghitung tanggal berikutnya");
+              }
+             // console.log("Tanggal berikutnya: " + tanggalBerikutnyaFormatted);
+
+              return tanggalBerikutnyaFormatted;
+            }
           },
             {
             //number
-            targets: @if(auth()->user()->role=='admin')-2 @else -1 @endif,
+            targets: @if(auth()->user()->role=='admin')-3 @else -2 @endif,
             title: 'Status',
             orderable: false,
             render: function (data, type, full, meta) {
               if(full.konstat>0){
                 var p = "Disewa";
               }else{
-                var p ="Kosong";
+                var p ='<div class="text-center"><a class="a_sewa btn-sm btn btn-primary" pdf="'+full.id+'">Sewa</a> </div>';
               }
               return p;
             }
@@ -211,7 +369,7 @@ $(function () {
             title: 'Aksi',
             orderable: false,
             render: function (data, type, full, meta) {
-              return '<div class="text-center"><a class="a_edit btn-sm btn btn-primary" pdf="'+full.id+'">Ubah</a> <a class=" btn-sm a_delete btn btn-primary" pdf="'+full.id+'" href="//{{request()->getHttpHost()}}/admin/m/blok_delete/'+full.id+'">Hapus</a></div>';
+              return '<div class="text-center"><a class="a_edit btn-sm btn btn-primary" pdf="'+full.id+'">Ubah</a> <a class=" btn-sm a_delete btn btn-primary" pdf="'+full.id+'" href="//{{request()->getHttpHost()}}/admin/m/blok_delete/'+full.id+'/{{$kat}}">Hapus</a></div>';
             }
           }@endif
         ],
@@ -289,9 +447,14 @@ $(function () {
             $("#basic-icon-default-nomor").val(data.data.nomor_kios).change();
             $("#basic-icon-default-blok").val(data.data.blok).change();
             $("#id_kode").val(data.data.id).change();
-            $("#btn-add").click();
+            $('#backdrop').modal('show'); 
           }
         });
+    });
+    $('.dt-anggota').on('click', '.a_sewa', function () {
+      var dat = $(this).attr('pdf');
+      $("#basic-icon-default-id_blok").val(dat).change();
+      $('#modalSewa').modal('show');
     });
 
 </script>

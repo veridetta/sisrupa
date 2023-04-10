@@ -18,14 +18,17 @@ class LokasiController extends Controller
     $pageConfigs = ['showMenu' => true,'mainLayoutType'=>'vertical'];
     $breadcrumbs = [ ['link' => "javascript:void(0)", 'name' => auth()->user()->role], ['name' => "Lokasi Pasar"]];
     $kar = lokasi::orderBy('id')->get();
+    $lokasi_pasar = lokasi::orderBy('id')->get();
     $val = array('primary','secondary','warning','danger','info');
-    return view('layouts/admin/lokasi', ['val'=>$val,'kars'=>$kar,'pageConfigs' => $pageConfigs, 'breadcrumbs' => $breadcrumbs]);
+    return view('layouts/admin/lokasi', ['val'=>$val,'kars'=>$kar,'pageConfigs' => $pageConfigs, 'breadcrumbs' => $breadcrumbs,'lokasi_pasars'=>$lokasi_pasar]);
   }
   public function lokasi_add(Request $request){
+    
     $validator = Validator::make($request->all(), [
       'kode' => 'required',
       'nama' => 'required',
       'lok' => 'required',
+      'info_file' => 'image|mimes:jpg,png,jpeg,gif,svg|max:2048',
     ]);
     
     if ($validator->fails()) {
@@ -34,12 +37,20 @@ class LokasiController extends Controller
       return redirect()->route('lokasi-admin')->withErrors($validator)
       ->withInput();;
     }
+    if($request->info_file){
+      $path_logo = 'denah/'.time().'.denah.'.$request->info_file->extension();
+      // Public Folder
+      $request->info_file->storeAs('images', $path_logo,'public');
+    }else{
+      $path_logo='';
+    }
     $user = lokasi::updateOrCreate([
         'id' => $request->id
     ], [
         'kode' => $request->kode,
         'nama' => $request->nama,
-        'lokasi' => $request->lok
+        'lokasi' => $request->lok,
+        'denah' => $path_logo
     ]);
     if($request->id){
       if($user){

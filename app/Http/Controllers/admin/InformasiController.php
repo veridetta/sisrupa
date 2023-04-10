@@ -7,6 +7,7 @@ use App\Models\Informasi;
 use App\Http\Requests\StoreInformasiRequest;
 use App\Http\Requests\UpdateInformasiRequest;
 use App\Models\Informasis;
+use App\Models\lokasi;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -19,8 +20,9 @@ class InformasiController extends Controller
         $breadcrumbs = [ ['link' => "javascript:void(0)", 'name' => auth()->user()->role], ['name' => "Halaman Informasi"]];
         $kar = User::orderBy('name')->get();
         $data=Informasi::get();
+        $lokasi_pasar = lokasi::orderBy('id')->get();
         $val = array('primary','secondary','warning','danger','info');
-        return view('layouts/admin/info', ['val'=>$val,'data'=>$data,'kars'=>$kar,'pageConfigs' => $pageConfigs, 'breadcrumbs' => $breadcrumbs]);
+        return view('layouts/admin/info', ['val'=>$val,'data'=>$data,'kars'=>$kar,'pageConfigs' => $pageConfigs, 'breadcrumbs' => $breadcrumbs,'lokasi_pasars'=>$lokasi_pasar]);
     }
 
     public function info_add(Request $request){

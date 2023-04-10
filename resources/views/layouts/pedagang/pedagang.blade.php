@@ -50,6 +50,7 @@
                     <th>Nama</th>
                     <th>Jenis Dagangan</th>
                     <th>Username</th>
+                    <th>Email</th>
                     <th>Tempat/Tanggal Lahir</th>
                     <th>Telp</th>
                     <th>Jenis Kelamin</th>
@@ -96,6 +97,22 @@
                     value="{{old('username')}}"
                   />
                   @error('username')
+                      <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                      </span>
+                    @enderror
+                </div>
+                <div class="mb-1">
+                  <label class="form-label" for="basic-icon-default-email">Email</label>
+                  <input
+                    type="text"
+                    id="basic-icon-default-email"
+                    class="form-control dt-email"
+                    name="email"
+                    placeholder="xxxx"
+                    value="{{old('email')}}"
+                  />
+                  @error('email')
                       <span class="invalid-feedback" role="alert">
                         <strong>{{ $message }}</strong>
                       </span>
@@ -259,6 +276,7 @@ $(function () {
           { data: 'name' },
           { data: 'jnama' },
           { data: 'username' },
+          { data: 'email' },
           { data: 'ttl' },
           { data: 'telp' },
           { data: 'jk' },
@@ -360,6 +378,7 @@ $(function () {
               console.log(data);
             var id_users=data.data.id+'&&'+data.data.rt+'&&'+data.data.rw;
             $("#basic-icon-default-username").val(data.data.username).change();
+            $("#basic-icon-default-email").val(data.data.email).change();
             $("#basic-icon-default-nama").val(data.data.name).change();
             $("#basic-icon-default-ttl").val(data.data.ttl).change();
             $("#basic-icon-default-jk").val(data.data.jk).change();

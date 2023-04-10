@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\blok;
 use App\Models\kontrakan;
+use App\Models\lokasi;
 use App\Models\pedagang;
 use App\Models\pembayaran;
 use App\Models\tagihan;
@@ -17,17 +18,23 @@ use Illuminate\Support\Facades\Validator;
 class pembayaranController extends Controller
 {
 
-  public function pembayaran()
+  public function pembayaran(Request $request)
   {
+    $kat=$request->id;
+    
+    $p=lokasi::where('id','=',$kat)->first();
+    $pasar=$p->nama;
+    
     $pageConfigs = ['showMenu' => true,'mainLayoutType'=>'vertical'];
-    $breadcrumbs = [ ['link' => "javascript:void(0)", 'name' => auth()->user()->role], ['name' => "Data Pembayaran Kios"]];
+    $breadcrumbs = [ ['link' => "javascript:void(0)", 'name' => auth()->user()->role], ['name' => "Data Retribusi Kios"]];
     $kar = kontrakan::orderBy('id')->get();
     $val = array('primary','secondary','warning','danger','info');
     $pedagang=pedagang::join('users','users.id','=','pedagangs.id_users')->select('pedagangs.*','users.name as name')->orderBy('users.name')->get();
     $petugas=User::where('role','=','petugas')->orderBy('name')->get();
     $tagihan=tagihan::orderBy('nama')->get();
-    $blok=blok::join('lokasis','lokasis.id','=','bloks.id_lokasi')->orderBy('lokasis.nama')->get();
-    return view('layouts/admin/pembayaran', ['petugass'=>$petugas,'tagihans'=>$tagihan,'pedagangs'=>$pedagang,'bloks'=>$blok,'val'=>$val,'kars'=>$kar,'pageConfigs' => $pageConfigs, 'breadcrumbs' => $breadcrumbs]);
+    $blok=blok::join('lokasis','lokasis.id','=','bloks.id_pasar')->orderBy('lokasis.nama')->get();
+    $lokasi_pasar = lokasi::orderBy('id')->get();
+    return view('layouts/admin/pembayaran', ['petugass'=>$petugas,'tagihans'=>$tagihan,'pedagangs'=>$pedagang,'bloks'=>$blok,'val'=>$val,'kars'=>$kar,'pageConfigs' => $pageConfigs, 'breadcrumbs' => $breadcrumbs,'kat'=>$kat,'pasar'=>$pasar,'lokasi_pasars'=>$lokasi_pasar]);
   }
   public function pembayaran_add(Request $request){
     $validator = Validator::make($request->all(), [
@@ -37,12 +44,13 @@ class pembayaranController extends Controller
       'tanggal' => 'required',
       'ket' => 'required',
       'nominal' => 'required',
+      
     ]);
     
     if ($validator->fails()) {
       dd($validator);
       session()->flash('error', 'Periksa ulang kembali.');
-      return redirect()->route('pembayaran-admin')->withErrors($validator)
+      return redirect()->route('pembayaran-admin',['id'=>$request->id])->withErrors($validator)
       ->withInput();;
     }
     $user = pembayaran::updateOrCreate([
@@ -66,11 +74,11 @@ class pembayaranController extends Controller
         //redirect
       }
     }
-    return redirect()->route('pembayaran-admin');
+    return redirect()->route('pembayaran-admin',['id'=>$request->id_pasar]);
   }
-  public function pembayaran_data()
+  public function pembayaran_data(Request $request)
   {
-    $user=pembayaran::join('pedagangs','pedagangs.id','=','pembayarans.id_pedagang')->join('jenis','jenis.id','=','pedagangs.jenis')->join('tagihans','tagihans.id','=','pembayarans.id_tagihan')->join('users as p','p.id','=','pedagangs.id_users')->join('users as t','t.id','=','pembayarans.id_petugas')->select('p.name as name','jenis.nama as jenis','pembayarans.tanggal_pembayaran as tanggal','tagihans.nama as tagihan','tagihans.nominal as nominal','pembayarans.keterangan as keterangan','t.name as petugas','pembayarans.id as id','pembayarans.id_pedagang as id_pedagang','pembayarans.id_tagihan as id_tagihan')->orderBy('pembayarans.id')->get();
+    $user=pembayaran::leftJoin('pedagangs','pedagangs.id','=','pembayarans.id_pedagang')->leftJoin('jenis','jenis.id','=','pedagangs.jenis')->leftJoin('tagihans','tagihans.id','=','pembayarans.id_tagihan')->leftJoin('users as p','p.id','=','pedagangs.id_users')->leftJoin('users as t','t.id','=','pembayarans.id_petugas')->select('p.name as name','jenis.nama as jenis','pembayarans.tanggal_pembayaran as tanggal','tagihans.nama as tagihan','tagihans.nominal as nominal','pembayarans.keterangan as keterangan','t.name as petugas','pembayarans.id as id','pembayarans.id_pedagang as id_pedagang','pembayarans.id_tagihan as id_tagihan')->where('pedagangs.id_pasar','=',$request->id)->orderBy('pembayarans.id')->get();
     return ['data' => $user];
   }
   public function pembayaran_data_single(Request $request)
@@ -84,7 +92,7 @@ class pembayaranController extends Controller
         session()->flash('success', 'Data Berhasil dihapus.');
         //redirect
     }
-    return redirect()->route('pembayaran-admin');
+    return redirect()->route('pembayaran-admin',['id'=>$request->id_pasar]);
   }
 
 }

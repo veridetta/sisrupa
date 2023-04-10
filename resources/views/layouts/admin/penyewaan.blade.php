@@ -1,7 +1,7 @@
 
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Data Penyewaan Kios')
+@section('title', 'Data Penyewaan Kios '.$pasar)
 
 @section('vendor-style')
   <!-- vendor css files -->
@@ -37,7 +37,7 @@
                       </div>
                 </div>
                 <div class="col-lg-11 col-10 my-auto">
-                    <p class="h4 card-text text-white">Daftar Penyewaan</p>
+                    <p class="h4 card-text text-white">Data Penyewaan {{$pasar}}</p>
                 </div>
             </div>
           </div>
@@ -83,9 +83,10 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <form class="add-new-user pt-0" method="POST" action="{{route('penyewaan-add-admin')}}">
+              <form class="add-new-user pt-0" id="myForm" method="POST" action="{{route('penyewaan-add-admin')}}">
                 @csrf
                 <input type="hidden" name="id" value="" id="id_kode"/>
+                <input type="hidden" name="id_pasar" value="{{$kat}}" id="id_pasar"/>
                 <div class="mb-1">
                   <label class="form-label" for="basic-icon-default-id_pedagang">Nama Pedagang</label>
                   <select
@@ -207,14 +208,19 @@
   /**
 * DataTables Basic
 */
-
+$('.add-new').click(function(){
+  var kat = '{{$kat}}';
+  document.getElementById("myForm").reset();
+  $("#id_pasar").val(kat);
+  $("#id_kode").val('');
+});
 $(function () {
     'use strict';
     var dt_anggota = $('.dt-anggota');
     // DATA ANGGOTA
     if (dt_anggota.length) {
       var dt_ang = dt_anggota.DataTable({
-        ajax: "{{route('penyewaan-data-admin')}}",
+        ajax: "{{route('penyewaan-data-admin',['id'=>$kat])}}",
         columns: [
           { data: '' },
           { data: 'name' },
@@ -262,7 +268,7 @@ $(function () {
             title: 'Aksi',
             orderable: false,
             render: function (data, type, full, meta) {
-              return '<div class="text-center"><a class="a_edit btn-sm btn btn-primary" pdf="'+full.id+'">Ubah</a> <a class=" btn-sm a_delete btn btn-primary" pdf="'+full.id+'" href="//{{request()->getHttpHost()}}/admin/p/penyewaan_delete/'+full.id+'">Hapus</a></div>';
+              return '<div class="text-center"><a class="a_edit btn-sm btn btn-primary" pdf="'+full.id+'">Ubah</a> <a class=" btn-sm a_delete btn btn-primary" pdf="'+full.id+'" href="//{{request()->getHttpHost()}}/admin/p/penyewaan_delete/'+full.id+'/{{$kat}}">Hapus</a></div>';
             }
           }@endif
         ],
@@ -342,7 +348,7 @@ $(function () {
             $("#basic-icon-default-tanggal").val(data.data.tanggal).change();
             $("#basic-icon-default-keterangan").val(data.data.keterangan).change();
             $("#id_kode").val(data.data.id).change();
-            $("#btn-add").click();
+            $('#backdrop').modal('show'); 
           }
         });
     });

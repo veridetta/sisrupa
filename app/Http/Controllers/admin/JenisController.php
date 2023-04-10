@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\jenis;
+use App\Models\lokasi;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,8 +19,9 @@ class JenisController extends Controller
     $pageConfigs = ['showMenu' => true,'mainLayoutType'=>'vertical'];
     $breadcrumbs = [ ['link' => "javascript:void(0)", 'name' => auth()->user()->role], ['name' => "Jenis Dagangan"]];
     $kar = jenis::orderBy('id')->get();
+    $lokasi_pasar = lokasi::orderBy('id')->get();
     $val = array('primary','secondary','warning','danger','info');
-    return view('layouts/admin/jenis_pedagang', ['val'=>$val,'kars'=>$kar,'pageConfigs' => $pageConfigs, 'breadcrumbs' => $breadcrumbs]);
+    return view('layouts/admin/jenis_pedagang', ['val'=>$val,'kars'=>$kar,'pageConfigs' => $pageConfigs, 'breadcrumbs' => $breadcrumbs,'lokasi_pasars'=>$lokasi_pasar]);
   }
   public function jenis_add(Request $request){
     $validator = Validator::make($request->all(), [

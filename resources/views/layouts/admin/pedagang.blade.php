@@ -1,7 +1,7 @@
 
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Data Pedagang')
+@section('title', 'Data Pedagang '.$pasar)
 
 @section('vendor-style')
   <!-- vendor css files -->
@@ -37,7 +37,7 @@
                       </div>
                 </div>
                 <div class="col-lg-11 col-10 my-auto">
-                    <p class="h4 card-text text-white">Daftar Pedagang</p>
+                    <p class="h4 card-text text-white">Daftar Pedagang {{$pasar}}</p>
                 </div>
             </div>
           </div>
@@ -50,6 +50,7 @@
                     <th>Nama</th>
                     <th>Jenis Dagangan</th>
                     <th>Username</th>
+                    <th>Email</th>
                     <th>Tempat/Tanggal Lahir</th>
                     <th>Telp</th>
                     <th>Jenis Kelamin</th>
@@ -81,10 +82,11 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <form class="add-new-user pt-0" method="POST" action="{{route('pedagang-add-admin')}}">
+              <form class="add-new-user pt-0" method="POST" action="{{route('pedagang-add-admin')}}" id="myForm">
                 @csrf
                 <input type="hidden" name="id" value="" id="id_kode"/>
                 <input type="hidden" name="id_users" value="" id="id_users"/>
+                <input type="hidden" name="id_pasar" value="{{$kat}}" id="id_pasar"/>
                 <div class="mb-1">
                   <label class="form-label" for="basic-icon-default-username">Username</label>
                   <input
@@ -96,6 +98,22 @@
                     value="{{old('username')}}"
                   />
                   @error('username')
+                      <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                      </span>
+                    @enderror
+                </div>
+                <div class="mb-1">
+                  <label class="form-label" for="basic-icon-default-email">Email</label>
+                  <input
+                    type="text"
+                    id="basic-icon-default-email"
+                    class="form-control dt-email"
+                    name="email"
+                    placeholder="xxxx"
+                    value="{{old('email')}}"
+                  />
+                  @error('email')
                       <span class="invalid-feedback" role="alert">
                         <strong>{{ $message }}</strong>
                       </span>
@@ -221,6 +239,65 @@
                 <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
               </form>
             </div>
+          </div>
+        </div>
+      </div>
+      <div
+      class="modal modal-primary fade text-start"
+      id="backdrop2"
+      tabindex="-1"
+      aria-labelledby="myModalLabel2"
+      data-bs-backdrop="false"
+      aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title" id="myModalLabel2">Detail Pedagang</h4>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table>
+                <tr>
+                  <td>No Registrasi</td>
+                  <td>: PDG<span id="tb-no"></span></td>
+                </tr>
+                <tr>
+                  <td>Tanggal Registrasi</td>
+                  <td>: <span id="tb-tanggal"></span></td>
+                </tr>
+                <tr>
+                  <td>Nama Pedagang</td>
+                  <td>: <span id="tb-nama"></span></td>
+                </tr>
+                <tr>
+                  <td>Alamat</td>
+                  <td>: <span id="tb-alamat"></span></td>
+                </tr>
+                <tr>
+                  <td>No Telp</td>
+                  <td>: <span id="tb-telp"></span></td>
+                </tr>
+                <tr>
+                  <td>Jenis Kelamin</td>
+                  <td>: <span id="tb-jk"></span></td>
+                </tr>
+                <tr>
+                  <td>Tempat/Tanggal Lahir</td>
+                  <td>: <span id="tb-ttl"></span></td>
+                </tr>
+                
+                <tr>
+                  <td>Blok</td>
+                  <td>: <span id="tb-blok"></span></td>
+                </tr>
+                <tr>
+                  <td>Jenis Dagangan</td>
+                  <td>: <span id="tb-jenis"></span></td>
+                </tr>
+              </table>
+            </div>
+
+          </div>
         </div>
       </div>
 </section>
@@ -246,19 +323,25 @@
   /**
 * DataTables Basic
 */
-
+$('.add-new').click(function(){
+  var kat = '{{$kat}}';
+  document.getElementById("myForm").reset();
+  $("#id_pasar").val(kat);
+  $("#id_users").val('');
+});
 $(function () {
     'use strict';
     var dt_anggota = $('.dt-anggota');
     // DATA ANGGOTA
     if (dt_anggota.length) {
       var dt_ang = dt_anggota.DataTable({
-        ajax: "{{route('pedagang-data-admin')}}",
+        ajax: "{{route('pedagang-data-admin',['id'=>$kat])}}",
         columns: [
           { data: '' },
           { data: 'name' },
           { data: 'jnama' },
           { data: 'username' },
+          { data: 'email' },
           { data: 'ttl' },
           { data: 'telp' },
           { data: 'jk' },
@@ -285,7 +368,7 @@ $(function () {
             title: 'Aksi',
             orderable: false,
             render: function (data, type, full, meta) {
-              return '<div class="text-center"><a class="a_edit btn-sm btn btn-primary" pdf="'+full.id+'">Ubah</a> <a class=" btn-sm a_delete btn btn-primary" pdf="'+full.id+'" href="//{{request()->getHttpHost()}}/admin/d/pedagang_delete/'+full.id+'">Hapus</a></div>';
+              return '<div class="text-center"><a class=" a_show" pdf="'+full.id+'" href="#">'+feather.icons['eye'].toSvg({ class: 'font-small-4' }) +'</a> <a class="a_edit" pdf="'+full.id+'">'+feather.icons['edit'].toSvg({ class: 'font-small-4' }) +'</a> <a class=" a_delete" pdf="'+full.id+'" href="//{{request()->getHttpHost()}}/admin/d/pedagang_delete/'+full.id+'/{{$kat}}">'+feather.icons['trash'].toSvg({ class: 'font-small-4' }) +'</a></div>';
             }
           }@endif
         ],
@@ -348,7 +431,7 @@ $(function () {
       });
     }
   });
-  $('.dt-anggota').on('click', '.a_edit', function () {
+    $('.dt-anggota').on('click', '.a_edit', function () {
         //dt_anggota.row($(this).parents('tr')).remove().draw();
         var dat = $(this).attr('pdf');
         var url = "//{{request()->getHttpHost()}}/admin/d/pedagang_data_single/"+dat;
@@ -360,6 +443,7 @@ $(function () {
               console.log(data);
             var id_users=data.data.id+'&&'+data.data.rt+'&&'+data.data.rw;
             $("#basic-icon-default-username").val(data.data.username).change();
+            $("#basic-icon-default-email").val(data.data.email).change();
             $("#basic-icon-default-nama").val(data.data.name).change();
             $("#basic-icon-default-ttl").val(data.data.ttl).change();
             $("#basic-icon-default-jk").val(data.data.jk).change();
@@ -368,7 +452,32 @@ $(function () {
             $("#basic-icon-default-jenis").val(data.data.jenis).change();
             $("#id_kode").val(data.data.id).change();
             $("#id_users").val(data.data.id_users).change();
-            $("#btn-add").click();
+            $('#backdrop').modal('show'); 
+          }
+        });
+    });
+    $('.dt-anggota').on('click', '.a_show', function () {
+        //dt_anggota.row($(this).parents('tr')).remove().draw();
+        var dat = $(this).attr('pdf');
+        var url = "//{{request()->getHttpHost()}}/admin/d/pedagang_data_single/"+dat;
+        $.ajax({
+          type: "GET",
+          url: url,
+          success: function(data){
+              //if request if made successfully then the response represent the data
+              console.log(data);
+              var no=('0' + data.data.id).slice(-3)
+            var id_users=data.data.id+'&&'+data.data.rt+'&&'+data.data.rw;
+            $("#tb-no").html(no);
+            $("#tb-tanggal").html(data.data.tanggal);
+            $("#tb-nama").html(data.data.name);
+            $("#tb-alamat").html(data.data.alamat);
+            $("#tb-telp").html(data.data.telp);
+            $("#tb-jk").html(data.data.jk);
+            $("#tb-ttl").html(data.data.ttl);
+            $("#tb-blok").html(data.data.no_kios);
+            $("#tb-jenis").html(data.data.jnama);
+            $('#backdrop2').modal('show'); 
           }
         });
     });

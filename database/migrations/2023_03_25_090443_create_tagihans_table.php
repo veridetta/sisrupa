@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('kode');
             $table->string('nama');
             $table->string('nominal');
+            $table->string('id_pasar');
             $table->string('jenis');//harian, bulanan, tahunan
             $table->timestamps();
         });

@@ -13,6 +13,7 @@ class tagihan extends Model
         'kode',
         'nama',
         'nominal',
-        'jenis'
+        'jenis',
+        'id_pasar'
     ];
 }

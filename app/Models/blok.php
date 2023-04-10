@@ -13,6 +13,6 @@ class blok extends Model
         'nomor_kios',
         'status',
         'blok',
-        'id_lokasi'
+        'id_pasar'
     ];
 }

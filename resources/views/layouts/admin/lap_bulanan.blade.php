@@ -1,7 +1,7 @@
 
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Laporan Bulan '.$bulan.' '.$tahun)
+@section('title', 'Laporan '.$pasar.' Bulan '.$bulan.' '.$tahun)
 
 @section('vendor-style')
   <!-- vendor css files -->
@@ -42,6 +42,7 @@
               @csrf
               <div class="row">
                 <div class="col-md-4">
+                  <input type="hidden" name="id_pasar" value="{{$kat}}" id="id_pasar"/>
                   <select class="form-select" name="bulan" aria-label="Select Bulan">
                     <option selected disabled>Pilih Bulan</option>
                     <option value="01">Januari</option>
@@ -122,7 +123,7 @@ $(function () {
     // DATA ANGGOTA
     if (dt_anggota.length) {
       var dt_ang = dt_anggota.DataTable({
-        ajax: "{{ route('bulan-data-admin', ['bulan' => $bulan_a,'tahun'=>$tahun]) }}",
+        ajax: "{{ route('bulan-data-admin', ['bulan' => $bulan_a,'tahun'=>$tahun,'id'=>$kat]) }}",
         columns: [
           { data: '' },
           { data: 'name' },
@@ -131,8 +132,7 @@ $(function () {
           { data: 'tagihan' },
           { data: 'nominal' },
           { data: 'keterangan' },
-          { data: 'petugas' },
-          @if(auth()->user()->role=='admin'){ data: '' }@endif
+          { data: 'petugas' }
         ],
         columnDefs: [
           {

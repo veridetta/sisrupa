@@ -50,6 +50,7 @@
                     <th>Kode</th>
                     <th>Nama</th>
                     <th>Lokasi</th>
+                    <th>Denah</th>
                     @if(auth()->user()->role=='admin')
                     <th>Keterangan</th>
                     @endif
@@ -77,7 +78,7 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <form class="add-new-user pt-0" method="POST" action="{{route('lokasi-add-admin')}}">
+              <form class="add-new-user pt-0" enctype="multipart/form-data" method="POST" action="{{route('lokasi-add-admin')}}">
                 @csrf
                 <input type="hidden" name="id" value="" id="id_kode"/>
                 <div class="mb-1">
@@ -127,10 +128,51 @@
                       </span>
                     @enderror
                 </div>
+                <div class="mb-1">
+                  <label class="form-label" for="basic-icon-default-info_file">Denah <small>(Wajib diisi)</small></label>
+                  <input
+                    type="file"
+                    id="basic-icon-default-info_file"
+                    class="form-control dt-info_file"
+                    placeholder="upload image"
+                    name="info_file"
+                  />
+                </div>
                 <button type="submit" class="btn btn-primary me-1 data-submit">Kirim</button>
                 <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
               </form>
             </div>
+        </div>
+      </div>
+      </div>
+      <div class="disabled-backdrop-ex">
+        <!-- Button trigger modal -->
+        <button type="button" class="d-none btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#backdrop2" id="img_button">
+          Disabled Backdrop
+        </button>
+        <!-- Modal -->
+        <div
+          class="modal modal-primary fade text-start"
+          id="backdrop2"
+          tabindex="-1"
+          aria-labelledby="myModalLabelx"
+          data-bs-backdrop="false"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabelx">Disabled Backdrop</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body text-center">
+                <img src="" alt="" id="img_modal" title="" class="img-fluid"/>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Kembali</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 </section>
@@ -156,7 +198,6 @@
   /**
 * DataTables Basic
 */
-
 $(function () {
     'use strict';
     var dt_anggota = $('.dt-anggota');
@@ -169,6 +210,7 @@ $(function () {
           { data: 'kode' },
           { data: 'nama' },
           { data: 'lokasi' },
+          { data: 'denah' },
           @if(auth()->user()->role=='admin'){ data: '' }@endif
         ],
         columnDefs: [
@@ -183,6 +225,16 @@ $(function () {
             orderable: false,
             render: function (data, type, full, meta) {
               return meta.row + meta.settings._iDisplayStart + 1;
+            }
+          },{
+            //number
+            targets: -2,
+            title: 'Denah',
+            orderable: false,
+            render: function (data, type, full, meta) {
+              var denah = full.denah;
+              var judul = full.nama;
+              return '<div class="text-center"><a class="d-flex a_denah flex-row p-1 align-items-center" denah='+denah+' judul='+judul+'><img class="me-1" src="//{{request()->getHttpHost()}}/images/icons/jpg.png" alt="data.json" height="18"><span class="mb-0 h6 badge badge-light-primary badge-glow">buka lampiran</span></a></div>';
             }
           }@if(auth()->user()->role=='admin'),
           {
@@ -272,6 +324,15 @@ $(function () {
             $("#btn-add").click();
           }
         });
+    });
+    $('.dt-anggota').on('click', '.a_denah', function () {
+        //dt_anggota.row($(this).parents('tr')).remove().draw();
+        var denah = $(this).attr('denah');
+        var judul = $(this).attr('judul');
+        var locat = "{{ asset('/storage/images/') }}"+"/"+denah;
+        $("#myModalLabelx").html(judul);
+        $('#img_button').trigger('click');
+        $("#img_modal").attr("src",locat);
     });
 
 </script>

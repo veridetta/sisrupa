@@ -1,7 +1,7 @@
 
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Data Pembayaran')
+@section('title', 'Data Retribusi '.$pasar)
 
 @section('vendor-style')
   <!-- vendor css files -->
@@ -23,7 +23,7 @@
       <div class="col-lg-12 col-sm-12 col-12">
         @if(auth()->user()->role=='admin' || auth()->user()->role=='petugas')
         <button id="btn-add" class="dt-button add-new btn btn-primary mb-2"  
-        aria-controls="DataTables_Table_0" type="button" data-bs-toggle="modal" data-bs-target="#backdrop"><span>Buat Pembayaran</span></button>
+        aria-controls="DataTables_Table_0" type="button" data-bs-toggle="modal" data-bs-target="#backdrop"><span>Tambah Transaksi</span></button>
         @endif
         <div class="card">
 
@@ -37,7 +37,7 @@
                       </div>
                 </div>
                 <div class="col-lg-11 col-10 my-auto">
-                    <p class="h4 card-text text-white">Daftar Pembayaran</p>
+                    <p class="h4 card-text text-white">Data Retribusi {{$pasar}}</p>
                 </div>
             </div>
           </div>
@@ -79,9 +79,10 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <form class="add-new-user pt-0" method="POST" action="{{route('pembayaran-add-admin')}}">
+              <form class="add-new-user pt-0" id="myForm" method="POST" action="{{route('pembayaran-add-admin')}}">
                 @csrf
                 <input type="hidden" name="id" value="" id="id_kode"/>
+                <input type="hidden" name="id_pasar" value="" id="id_pasar"/>
                 <div class="mb-1">
                   <label class="form-label" for="basic-icon-default-id_pedagang">Nama Pedagang</label>
                   <select
@@ -214,6 +215,12 @@
   /**
 * DataTables Basic
 */
+$('.add-new').click(function(){
+  var kat = '{{$kat}}';
+  document.getElementById("myForm").reset();
+  $("#id_pasar").val(kat);
+  $("#id_kode").val('');
+});
 
 $(function () {
     'use strict';
@@ -221,7 +228,7 @@ $(function () {
     // DATA ANGGOTA
     if (dt_anggota.length) {
       var dt_ang = dt_anggota.DataTable({
-        ajax: "{{route('pembayaran-data-admin')}}",
+        ajax: "{{route('pembayaran-data-admin',['id'=>$kat])}}",
         columns: [
           { data: '' },
           { data: 'name' },
@@ -253,7 +260,7 @@ $(function () {
             title: 'Aksi',
             orderable: false,
             render: function (data, type, full, meta) {
-              return '<div class="text-center"><a href="//{{request()->getHttpHost()}}/admin/l/kwitansi/'+full.id+'" class="mb-1 a_cetak btn-sm btn btn-primary" pdf="'+full.id+'">'+feather.icons['printer'].toSvg({ class: 'font-small-4 text-white' }) + '</a> <div class="text-center"><a class="mb-1 a_edit btn-sm btn btn-primary" pdf="'+full.id+'">Ubah</a> <a class=" btn-sm a_delete btn btn-primary" pdf="'+full.id+'" href="//{{request()->getHttpHost()}}/admin/p/pembayaran_delete/'+full.id+'">Hapus</a></div>';
+              return '<div class="text-center"><a href="//{{request()->getHttpHost()}}/admin/l/kwitansi/'+full.id+'" class="mb-1 a_cetak btn-sm btn btn-primary" pdf="'+full.id+'">'+feather.icons['printer'].toSvg({ class: 'font-small-4 text-white' }) + '</a> <div class="text-center"><a class="mb-1 a_edit btn-sm btn btn-primary" pdf="'+full.id+'">Ubah</a> <a class=" btn-sm a_delete btn btn-primary" pdf="'+full.id+'" href="//{{request()->getHttpHost()}}/admin/p/pembayaran_delete/'+full.id+'/{{$kat}}">Hapus</a></div>';
             }
           }@endif
         ],
@@ -334,7 +341,7 @@ $(function () {
             $("#basic-icon-default-nominal").val(data.data.nominal).change();
             $("#basic-icon-default-ket").val(data.data.keterangan).change();
             $("#id_kode").val(data.data.id).change();
-            $("#btn-add").click();
+            $('#backdrop').modal('show'); 
           }
         });
     });

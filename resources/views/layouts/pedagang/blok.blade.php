@@ -1,7 +1,7 @@
 
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Jenis Tagihan')
+@section('title', 'Kios Saya')
 
 @section('vendor-style')
   <!-- vendor css files -->
@@ -21,12 +21,6 @@
 <section id="dashboard-analytics">
   @include('panels.flash')
       <div class="col-lg-12 col-sm-12 col-12">
-        @if(auth()->user()->role=='admin')
-        <button id="btn-add" class="dt-button add-new btn btn-primary mb-2"  
-        aria-controls="DataTables_Table_0" type="button" data-bs-toggle="modal" data-bs-target="#backdrop"><span>Tambah Jenis Tagihan</span></button>
-        @endif
-        <div class="card">
-
           <div class="card-header bg-primary flex-column align-items-start">
             <div class="row col-12">
                 <div class="col-lg-1 col-2">
@@ -37,7 +31,7 @@
                       </div>
                 </div>
                 <div class="col-lg-11 col-10 my-auto">
-                    <p class="h4 card-text text-white">Daftar Jenis Tagihan</p>
+                    <p class="h4 card-text text-white">Data Kios  Saya</p>
                 </div>
             </div>
           </div>
@@ -47,110 +41,22 @@
                 <thead class="table-light">
                   <tr>
                     <th>No</th>
-                    <th>Kode</th>
-                    <th>Nama</th>
+                    <th>Nomor Kios</th>
+                    <th>Blok</th>
                     <th>Nominal</th>
-                    <th>Jenis</th>
+                    <th>Jatuh Tempo</th>
+                    <th>Lokasi Pasar</th>
                     <th>Status</th>
+                    <th>Nama Pedagang</th>
+                    @if(auth()->user()->role=='admin')
+                    <th>Status</th>
+                    @endif
                   </tr>
                 </thead>
               </table>
             </div>
             
           </div>
-        </div>
-      </div>
-      <!-- Modal to add new user starts-->
-      <div
-      class="modal modal-primary fade text-start"
-      id="backdrop"
-      tabindex="-1"
-      aria-labelledby="myModalLabel4"
-      data-bs-backdrop="false"
-      aria-hidden="true"
-    >
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title" id="myModalLabel4">Tambah Jenis Tagihan</h4>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <form class="add-new-user pt-0" id="myForm" method="POST" action="{{route('tagihan-add-admin')}}">
-                @csrf
-                <input type="hidden" name="id" value="" id="id_kode"/>
-                <input type="hidden" name="id_pasar" value="{{$kat}}" id="id_pasar"/>
-                <div class="mb-1">
-                  <label class="form-label" for="basic-icon-default-kode">Kode</label>
-                  <input
-                    type="text"
-                    id="basic-icon-default-kode"
-                    class="form-control dt-kode"
-                    name="kode"
-                    placeholder="H04"
-                    value="{{old('kode')}}"
-                  />
-                  @error('kode')
-                      <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                      </span>
-                    @enderror
-                </div>
-                <div class="mb-1">
-                  <label class="form-label" for="basic-icon-default-nama">Nama</label>
-                  <input
-                    type="text"
-                    id="basic-icon-default-nama"
-                    class="form-control dt-nama"
-                    name="nama"
-                    placeholder="Xxxxx"
-                    value="{{old('nama')}}"
-                  />
-                  @error('nama')
-                      <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                      </span>
-                    @enderror
-                </div>
-                <div class="mb-1">
-                  <label class="form-label" for="basic-icon-default-nominal">Nominal</label>
-                  <input
-                    type="number"
-                    id="basic-icon-default-nominal"
-                    class="form-control dt-nominal"
-                    name="nominal"
-                    placeholder="Xxxxx"
-                    value="{{old('nominal')}}"
-                  />
-                  @error('nominal')
-                      <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                      </span>
-                    @enderror
-                </div>
-                <div class="mb-1">
-                  <label class="form-label" for="basic-icon-default-jenis">Jenis</label>
-                  <select
-                    type="text"
-                    id="basic-icon-default-jenis"
-                    class="form-control dt-jenis"
-                    name="jenis"
-                    placeholder="Xxxxx"
-                    value="{{old('jenis')}}">
-                    <option>Bulanan</option>
-                    <option>3 Bulan</option>
-                    <option>Tahunan</option>
-                  </select>
-                  @error('jenis')
-                      <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                      </span>
-                    @enderror
-                </div>
-                <button type="submit" class="btn btn-primary me-1 data-submit">Kirim</button>
-                <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-              </form>
-            </div>
         </div>
       </div>
 </section>
@@ -176,25 +82,22 @@
   /**
 * DataTables Basic
 */
-$('.add-new').click(function(){
-  var kat = '{{$kat}}';
-  document.getElementById("myForm").reset();
-  $("#id_pasar").val(kat);
-  $("#id_kode").val('');
-});
 $(function () {
     'use strict';
     var dt_anggota = $('.dt-anggota');
     // DATA ANGGOTA
     if (dt_anggota.length) {
       var dt_ang = dt_anggota.DataTable({
-        ajax: "{{route('tagihan-data-admin',['id'=>$kat])}}",
+        ajax: "{{route('blok-data-pedagang')}}",
         columns: [
           { data: '' },
-          { data: 'kode' },
-          { data: 'nama' },
+          { data: 'nomor_kios' },
+          { data: 'blok' },
           { data: 'nominal' },
-          { data: 'jenis' },
+          { data: 'jatuh_tempo' },
+          { data: 'id_pasar' },
+          { data: 'kontrakans.status' },
+          { data: 'nama_pedagang' },
           @if(auth()->user()->role=='admin'){ data: '' }@endif
         ],
         columnDefs: [
@@ -210,6 +113,79 @@ $(function () {
             render: function (data, type, full, meta) {
               return meta.row + meta.settings._iDisplayStart + 1;
             }
+          },
+            {
+            //number
+            targets: 4,
+            title: 'Lokasi Pasar',
+            orderable: false,
+            render: function (data, type, full, meta) {
+              if(full.id_pasar=='1'){
+                var p='Pasar Cigasong';
+              }else{
+                var p='Pasar Kadipaten';
+              }
+              return p;
+            }
+          },{
+            //number
+            targets: 3,
+            title: 'Jatuh Tempo',
+            orderable: false,
+            render: function (data, type, full, meta) {
+              // Tanggal awal
+              var tanggalAwal = new Date(full.jatuh_tempo);
+              
+              // Mendapatkan pilihan dari pengguna (1 bulan, 3 bulan, atau 1 tahun)
+              var pilihan = full.tagihan_kode; // Ganti dengan input dari pengguna
+
+              // Mendapatkan tanggal berikutnya berdasarkan pilihan
+              var tanggalBerikutnya;
+
+              if (pilihan === "tgh_bl1") {
+                tanggalBerikutnya = new Date(tanggalAwal);
+                tanggalBerikutnya.setMonth(tanggalAwal.getMonth() + 1);
+              } else if (pilihan === "tgh_bl3") {
+                tanggalBerikutnya = new Date(tanggalAwal);
+                tanggalBerikutnya.setMonth(tanggalAwal.getMonth() + 3);
+              } else if (pilihan === "tgh_th") {
+                tanggalBerikutnya = new Date(tanggalAwal);
+                tanggalBerikutnya.setFullYear(tanggalAwal.getFullYear() + 1);
+              } else {
+                console.error("Pilihan tidak valid");
+              }
+
+              if (tanggalBerikutnya) {
+                // Mendapatkan komponen tanggal berikutnya
+                var tahunBerikutnya = tanggalBerikutnya.getFullYear();
+                var bulanBerikutnya = ("0" + (tanggalBerikutnya.getMonth() + 1)).slice(-2);
+                var tanggalBerikutnya = ("0" + tanggalBerikutnya.getDate()).slice(-2);
+
+                // Format tanggal dalam format YYYY-MM-DD
+                var tanggalBerikutnyaFormatted = tahunBerikutnya + "-" + bulanBerikutnya + "-" + tanggalBerikutnya;
+
+                console.log("Tanggal berikutnya: " + tanggalBerikutnyaFormatted);
+              } else {
+                console.error("Gagal menghitung tanggal berikutnya");
+              }
+             // console.log("Tanggal berikutnya: " + tanggalBerikutnyaFormatted);
+
+              return tanggalBerikutnyaFormatted;
+            }
+          },
+            {
+            //number
+            targets: @if(auth()->user()->role=='admin')-3 @else -2 @endif,
+            title: 'Status',
+            orderable: false,
+            render: function (data, type, full, meta) {
+              if(full.konstat>0){
+                var p = "Disewa";
+              }else{
+                var p ='<div class="text-center"><a class="a_sewa btn-sm btn btn-primary" pdf="'+full.id+'">Sewa</a> </div>';
+              }
+              return p;
+            }
           }@if(auth()->user()->role=='admin'),
           {
             //number
@@ -217,7 +193,7 @@ $(function () {
             title: 'Aksi',
             orderable: false,
             render: function (data, type, full, meta) {
-              return '<div class="text-center"><a class="a_edit btn-sm btn btn-primary" pdf="'+full.id+'">Ubah</a> <a class=" btn-sm a_delete btn btn-primary" pdf="'+full.id+'" href="//{{request()->getHttpHost()}}/admin/m/tagihan_delete/'+full.id+'/{{$kat}}">Hapus</a></div>';
+              return '<div class="text-center"><a class="a_edit btn-sm btn btn-primary" pdf="'+full.id+'">Ubah</a> <a class=" btn-sm a_delete btn btn-primary" pdf="'+full.id+'" href="//{{request()->getHttpHost()}}/admin/m/blok_delete/'+full.id+'/{{$kat}}">Hapus</a></div>';
             }
           }@endif
         ],
@@ -283,23 +259,28 @@ $(function () {
   $('.dt-anggota').on('click', '.a_edit', function () {
         //dt_anggota.row($(this).parents('tr')).remove().draw();
         var dat = $(this).attr('pdf');
-        var url = "//{{request()->getHttpHost()}}/admin/m/tagihan_data_single/"+dat;
+        var url = "//{{request()->getHttpHost()}}/admin/m/blok_data_single/"+dat;
         $.ajax({
           type: "GET",
           url: url,
           success: function(data){
               //if request if made successfully then the response represent the data
               console.log(data);
-            var id_users=data.data.id+'&&'+data.data.rt+'&&'+data.data.rw;
-            $("#basic-icon-default-kode").val(data.data.kode).change();
-            $("#basic-icon-default-nama").val(data.data.nama).change();
-            $("#basic-icon-default-nominal").val(data.data.nominal).change();
-            $("#basic-icon-default-jenis").val(data.data.jenis).change();
+            //var id_users=data.data.id+'&&'+data.data.rt+'&&'+data.data.rw;
+            $("#basic-icon-default-lokasi").val(data.data.id_lokasi).change();
+            $("#basic-icon-default-nomor").val(data.data.nomor_kios).change();
+            $("#basic-icon-default-blok").val(data.data.blok).change();
             $("#id_kode").val(data.data.id).change();
             $('#backdrop').modal('show'); 
           }
         });
     });
+    $('.dt-anggota').on('click', '.a_sewa', function () {
+      var dat = $(this).attr('pdf');
+      $("#basic-icon-default-id_blok").val(dat).change();
+      $('#modalSewa').modal('show');
+    });
+    
 
 </script>
 

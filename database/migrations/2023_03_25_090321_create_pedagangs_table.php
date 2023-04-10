@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('telp');
             $table->string('jk');
             $table->string('jenis');
+            $table->string('id_pasar');
+            $table->string('status');
             $table->timestamps();
         });
     }

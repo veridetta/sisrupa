@@ -31,9 +31,20 @@
             <div class="col-12 my-2 justify-content-center">
               <input type="hidden" name="jabatan" value="warga"/>
                 <div class="mb-1">
+                  <input type="hidden" name="id_pasar" value="1"/>
                   <label for="register-username" class="form-label">Username</label>
                   <input type="text" class="form-control @error('username') is-invalid @enderror" id="register-username" name="username" placeholder="userxxxx" aria-describedby="register-username" tabindex="1" autofocus value="{{ old('username') }}" />
                   @error('username')
+                    <span class="invalid-feedback" role="alert">
+                      <strong>{{ $message }}</strong>
+                    </span>
+                  @enderror
+                </div>
+                <div class="mb-1">
+                  <input type="hidden" name="id_pasar" value="1"/>
+                  <label for="register-email" class="form-label">Email</label>
+                  <input type="text" class="form-control @error('email') is-invalid @enderror" id="register-email" name="email" placeholder="user@xxx.com" aria-describedby="register-email" tabindex="1" autofocus value="{{ old('email') }}" />
+                  @error('email')
                     <span class="invalid-feedback" role="alert">
                       <strong>{{ $message }}</strong>
                     </span>
@@ -65,7 +76,7 @@
                   <label for="register-name" class="form-label">Alamat</label>
                   <textarea type="text" class="form-control @error('alamat') is-invalid @enderror" id="register-alamat"
                     name="alamat" placeholder="" aria-describedby="register-alamat" tabindex="2"
-                    value="{{ old('alamat') }}" ></textarea>
+                    value="" >{{ old('alamat') }}</textarea>
                   @error('alamat')
                     <span class="invalid-feedback" role="alert">
                       <strong>{{ $message }}</strong>
@@ -103,9 +114,8 @@
                     name="jenis" placeholder="" aria-describedby="register-jenis" tabindex="2"
                     value="{{ old('jenis') }}" >
                     @foreach ($jeniss as $jenis)
-                      
-                    @endforeach
                     <option value="{{$jenis->id}}">{{$jenis->nama}}</option>
+                    @endforeach
                   </select>
                   @error('jenis')
                     <span class="invalid-feedback" role="alert">

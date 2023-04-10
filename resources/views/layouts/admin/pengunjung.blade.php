@@ -1,7 +1,7 @@
 
 @extends('layouts/contentLayoutMaster')
 
-@section('title', 'Petugas Pasar '.$kat)
+@section('title', 'Data Pengunjung ')
 
 @section('vendor-style')
   <!-- vendor css files -->
@@ -21,10 +21,6 @@
 <section id="dashboard-analytics">
   @include('panels.flash')
       <div class="col-lg-12 col-sm-12 col-12">
-        @if(auth()->user()->role=='admin')
-        <button id="btn-add" class="dt-button add-new btn btn-primary mb-2"  
-        aria-controls="DataTables_Table_0" type="button" data-bs-toggle="modal" data-bs-target="#backdrop"><span>Tambah Petugas Pasar</span></button>
-        @endif
         <div class="card">
 
           <div class="card-header bg-primary flex-column align-items-start">
@@ -37,7 +33,7 @@
                       </div>
                 </div>
                 <div class="col-lg-11 col-10 my-auto">
-                    <p class="h4 card-text text-white">Daftar Petugas {{$pasar}}</p>
+                    <p class="h4 card-text text-white">Daftar Pengunjung</p>
                 </div>
             </div>
           </div>
@@ -47,90 +43,16 @@
                 <thead class="table-light">
                   <tr>
                     <th>No</th>
-                    <th>Nama</th>
                     <th>Username</th>
-                    <th>Jabatan</th>
-                    <th>Keterangan</th>
+                    <th>Nama</th>
+                    <th>Alamat</th>
+                    <th>Telp</th>
                   </tr>
                 </thead>
               </table>
             </div>
             
           </div>
-        </div>
-      </div>
-      <!-- Modal to add new user starts-->
-      <div
-      class="modal modal-primary fade text-start"
-      id="backdrop"
-      tabindex="-1"
-      aria-labelledby="myModalLabel4"
-      data-bs-backdrop="false"
-      aria-hidden="true"
-    >
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title" id="myModalLabel4">Tambah Petugas Pasar</h4>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <form class="add-new-user pt-0" id="myForm" method="POST" action="{{route('petugas-add-admin')}}">
-                @csrf
-                <input type="hidden" name="id" value="" id="id_kode"/>
-                <input type="hidden" name="id_pasar" value="{{$kat}}" id="id_pasar"/>
-                <div class="mb-1">
-                  <label class="form-label" for="basic-icon-default-username">Username</label>
-                  <input
-                    type="text"
-                    id="basic-icon-default-username"
-                    class="form-control dt-username"
-                    name="username"
-                    placeholder="xxxx"
-                    value="{{old('username')}}"
-                  />
-                  @error('username')
-                      <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                      </span>
-                    @enderror
-                </div>
-                <div class="mb-1">
-                  <label class="form-label" for="basic-icon-default-password">Password</label>
-                  <input
-                    type="password"
-                    id="basic-icon-default-password"
-                    class="form-control dt-password"
-                    name="password"
-                    placeholder="xxxx"
-                    value="{{old('password')}}"
-                  />
-                  @error('password')
-                      <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                      </span>
-                    @enderror
-                </div>
-                <div class="mb-1">
-                  <label class="form-label" for="basic-icon-default-nama">Nama</label>
-                  <input
-                    type="text"
-                    id="basic-icon-default-nama"
-                    class="form-control dt-nama"
-                    name="nama"
-                    placeholder="Agus S"
-                    value="{{old('nama')}}"
-                  />
-                  @error('nama')
-                      <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                      </span>
-                    @enderror
-                </div>
-                <button type="submit" class="btn btn-primary me-1 data-submit">Kirim</button>
-                <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-              </form>
-            </div>
         </div>
       </div>
 </section>
@@ -156,26 +78,19 @@
   /**
 * DataTables Basic
 */
-$('.add-new').click(function(){
-  var kat = '{{$kat}}';
-  document.getElementById("myForm").reset();
-  $("#id_pasar").val(kat);
-  $("#id_kode").val('');
-});
-
 $(function () {
     'use strict';
     var dt_anggota = $('.dt-anggota');
     // DATA ANGGOTA
     if (dt_anggota.length) {
       var dt_ang = dt_anggota.DataTable({
-        ajax: "{{route('petugas-data-admin',['id'=>$kat])}}",
+        ajax: "{{route('pengunjung-data-admin')}}",
         columns: [
           { data: '' },
-          { data: 'name' },
           { data: 'username' },
-          { data: 'role' },
-          @if(auth()->user()->role=='admin'){ data: '' }@endif
+          { data: 'name' },
+          { data: 'alamat' },
+          { data: 'telp' },
         ],
         columnDefs: [
           {
@@ -190,30 +105,7 @@ $(function () {
             render: function (data, type, full, meta) {
               return meta.row + meta.settings._iDisplayStart + 1;
             }
-          },
-            {
-            //number
-            targets: -2,
-            title: 'Jabatan',
-            orderable: false,
-            render: function (data, type, full, meta) {
-              if(full.role='petugas'){
-                var p="Petugas Pasar";
-              }else{
-                var p = full.row;
-              }
-              return p;
-            }
-          }@if(auth()->user()->role=='admin'),
-          {
-            //number
-            targets: -1,
-            title: 'Aksi',
-            orderable: false,
-            render: function (data, type, full, meta) {
-              return '<div class="text-center"><a class="a_edit btn-sm btn btn-primary" pdf="'+full.id+'">Ubah</a> <a class=" btn-sm a_delete btn btn-primary" pdf="'+full.id+'" href="//{{request()->getHttpHost()}}/admin/d/petugas_delete/'+full.id+'/{{$kat}}">Hapus</a></div>';
-            }
-          }@endif
+          }
         ],
         dom: '<"card-header border-bottom p-1"<"head-label"><"dt-action-buttons text-end"B>><"d-flex justify-content-between align-items-center mx-0 row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>t<"d-flex justify-content-between mx-0 row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
       buttons: [
@@ -274,24 +166,7 @@ $(function () {
       });
     }
   });
-  $('.dt-anggota').on('click', '.a_edit', function () {
-        //dt_anggota.row($(this).parents('tr')).remove().draw();
-        var dat = $(this).attr('pdf');
-        var url = "//{{request()->getHttpHost()}}/admin/d/petugas_data_single/"+dat;
-        $.ajax({
-          type: "GET",
-          url: url,
-          success: function(data){
-              //if request if made successfully then the response represent the data
-              console.log(data);
-            var id_users=data.data.id+'&&'+data.data.rt+'&&'+data.data.rw;
-            $("#basic-icon-default-username").val(data.data.username).change();
-            $("#basic-icon-default-nama").val(data.data.name).change();
-            $("#id_kode").val(data.data.id).change();
-            $('#backdrop').modal('show'); 
-          }
-        });
-    });
+  
 
 </script>
 

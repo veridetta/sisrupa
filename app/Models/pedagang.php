@@ -15,6 +15,8 @@ class pedagang extends Model
         'alamat',
         'telp',
         'jk',
-        'jenis'
+        'jenis',
+        'status', //1 = sewa 0 = pengunjung
+        'id_pasar' //1 = Pasar Cigasong  2 = Pasar Kadipaten
     ];
 }
